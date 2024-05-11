@@ -32,6 +32,8 @@ userSchema.statics.signup = async function (email, password) {
     throw Error("Email already in use");
   }
 
+  const normalizedEmail = email.toLowerCase();
+
   // if (!validator.isStrongPassword(password)) {
   //   throw Error("Password not strong enough");
   // }
@@ -39,7 +41,7 @@ userSchema.statics.signup = async function (email, password) {
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
 
-  const user = await this.create({ email, password: hash });
+  const user = await this.create({ email: normalizedEmail, password: hash });
 
   return user;
 };
@@ -49,7 +51,9 @@ userSchema.statics.login = async function (email, password) {
     throw Error("All fields must be filled");
   }
 
-  const user = await this.findOne({ email });
+  const normalizedEmail = email.toLowerCase();
+
+  const user = await this.findOne({ email: normalizedEmail });
 
   if (!user) {
     throw Error("Incorrect email");
